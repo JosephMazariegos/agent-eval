@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -7,6 +8,14 @@ from app.database import SessionLocal, engine
 models.TaskDB.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*']
+)
 
 def get_db():
     db = SessionLocal()
@@ -27,6 +36,10 @@ def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_task)
     return db_task
+
+@app.get("/tasks", response_model=list[schemas.TaskResponse])
+def get_tasks(db: Session =  Depends(get_db)):
+    return db.query(models.TaskDB).all()
 
 # Add a GET endpoint (view tasks)
 @app.get("/tasks/{task_id}", response_model=schemas.TaskResponse)
