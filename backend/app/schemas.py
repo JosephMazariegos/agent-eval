@@ -11,3 +11,7 @@ class TaskResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class TaskUpdate(BaseModel):
+    title: str
+    description: str

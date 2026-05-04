@@ -4,6 +4,7 @@ function App() {
   const [tasks, setTasks] = useState([]); // state to store the list of tasks, initially empty array
   const [title, setTitle] = useState(""); // state to store title of new task, initially empty string
   const [description, setDescription] = useState(""); // state to store description of new task, initialy empty string
+  const [editingTaskId, setEditingTaskId] = useState(null); // state to store the ID of the task being edited, initially null
 
   function fetchTasks() {
     fetch("http://localhost:8000/tasks")
@@ -23,27 +24,47 @@ function App() {
   function handleSubmit(event) {
     event.preventDefault();
 
-    const newTask = {
+    const taskData = {
       title: title,
       description: description,
     };
 
-    fetch("http://127.0.0.1:8000/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newTask),
-    })
-      .then((response) => response.json())
-      .then(() => {
-        setTitle("");
-        setDescription("");
-        fetchTasks();
+    if (editingTaskId == null) {
+      fetch("http://127.0.0.1:8000/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
       })
-      .catch((error) => {
-        console.error("Error creating task:", error);
-      });
+        .then((response) => response.json())
+        .then(() => {
+          setTitle("");
+          setDescription("");
+          fetchTasks();
+        })
+        .catch((error) => {
+          console.error("Error creating task:", error);
+        });
+    } else {
+      fetch(`http://127.0.0.1:8000/tasks/${editingTaskId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
+      })
+        .then((response) => response.json())
+        .then(() => {
+          setTitle("");
+          setDescription("");
+          setEditingTaskId(null);
+          fetchTasks();
+        })
+        .catch((error) => {
+          console.error("Error updating task:", error);
+        });
+    }
   }
 
   function handleDelete(id) {
@@ -58,11 +79,17 @@ function App() {
       });
   }
 
+  function handleEdit(task) {
+    setEditingTaskId(task.id);
+    setTitle(task.title);
+    setDescription(task.description);
+  }
+
   return (
     <div style={{ padding: "2rem", frontFamily: "Arial" }}>
       <h1>AgentEval</h1>
 
-      <h2>Create Task</h2>
+      <h2>{editingTaskId == null ? "Create Task" : "Edit Task"}</h2>
 
       <form onSubmit={handleSubmit}>
         <div>
@@ -90,7 +117,18 @@ function App() {
 
         <br />
 
-        <button type="submit">Create Task</button>
+        <button type="submit">{editingTaskId == null ? "Create Task" : "Save Changes"}</button>
+        {editingTaskId !== null && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditingTaskId(null);
+              setTitle("");
+              setTitle("");
+              setDescription("");
+            }}
+            style={{ marginLeft: "10px"}}>Cancel</button>
+        )}
       </form>
 
       <hr />
@@ -104,6 +142,8 @@ function App() {
           {tasks.map((task) => (
             <li key={task.id}>
               <strong>{task.title}</strong> - {task.description}
+              <button onClick={() => handleEdit(task)}
+              style={{ marginLeft: "10px"}}>Edit</button>
               <button onClick={() => handleDelete(task.id)}
               style={{ marginLeft: "10px"}}>Delete</button>
             </li>

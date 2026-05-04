@@ -51,6 +51,21 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
 
     return task
 
+@app.put("/tasks/{task_id}", response_model=schemas.TaskUpdate)
+def update_task(task_id: int, updated_task: schemas.TaskUpdate, db: Session = Depends(get_db)):
+    task = db.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
+
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    task.title = updated_task.title
+    task.description = updated_task.description
+
+    db.commit()
+    db.refresh(task)
+
+    return task
+
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: int, db: Session = Depends(get_db)):
     task = db.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
