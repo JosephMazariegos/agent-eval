@@ -28,7 +28,7 @@ function App() {
       description: description,
     };
 
-    fetch("http://127.0.0.1:800/tasks", {
+    fetch("http://127.0.0.1:8000/tasks", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
