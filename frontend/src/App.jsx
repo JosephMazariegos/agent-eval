@@ -46,6 +46,18 @@ function App() {
       });
   }
 
+  function handleDelete(id) {
+    fetch(`http://127.0.0.1:8000/tasks/${id}`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        fetchTasks();
+      })
+      .catch((error) => {
+        console.error("Error deleting task:", error);
+      });
+  }
+
   return (
     <div style={{ padding: "2rem", frontFamily: "Arial" }}>
       <h1>AgentEval</h1>
@@ -92,6 +104,8 @@ function App() {
           {tasks.map((task) => (
             <li key={task.id}>
               <strong>{task.title}</strong> - {task.description}
+              <button onClick={() => handleDelete(task.id)}
+              style={{ marginLeft: "10px"}}>Delete</button>
             </li>
           ))}
         </ul>
