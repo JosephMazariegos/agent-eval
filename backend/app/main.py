@@ -77,3 +77,44 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Task deleted successfully"}
+
+@app.post("/tasks/{task_id}/submissions", response_model=schemas.SubmissionResponse)
+def create_submission(
+    task_id: int,
+    submission: schemas.SubmissionCreate,
+    db: Session = Depends(get_db)
+):
+    task = db.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
+
+    if task is None:
+        raise HTTPException(status_code=404, detail="TESTING ERROR!!!")
+
+    db_submission = models.SubmissionsDB(
+        task_id=task_id,
+        tool_name=submission.tool_name,
+        prompt_used=submission.prompt_used,
+        generated_code=submission.generated_code,
+        iteration_count=submission.iteration_count,
+        manual_edits=submission.manual_edits,
+        time_spent_seconds=submission.time_spent_seconds
+    )
+
+    db.add(db_submission)
+    db.commit()
+    db.refresh(db_submission)
+
+    return db_submission
+
+@app.get("/tasks/{task_id}/submissions", response_model=list[schemas.SubmissionResponse])
+def get_submissions_for_task(
+    task_id: int,
+    db: Session = Depends(get_db)
+):
+    task = db.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
+
+    if task is None:
+        raise HTTPException(status_code=404, detail="TESTING ERROR 2!")
+
+    return (
+        db.query(models.SubmissionsDB).filter(models.SubmissionsDB.task_id == task_id).all()
+    )
