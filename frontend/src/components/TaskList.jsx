@@ -1,6 +1,6 @@
 import TaskItem from "./TaskItem";
 
-function TaskList({ tasks, handleEdit, handleDelete}) {
+function TaskList({ tasks, handleEdit, handleDelete, handleViewSubmissions}) {
     return (
         <>
           <h2>Tasks</h2>
@@ -15,6 +15,7 @@ function TaskList({ tasks, handleEdit, handleDelete}) {
                       task={task}
                       handleEdit={handleEdit}
                       handleDelete={handleDelete}
+                      handleViewSubmissions={handleViewSubmissions}
                     />
                 ))}
             </ul>

@@ -9,6 +9,8 @@ function App() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [editingTaskId, setEditingTaskId] = useState(null);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [submissions, setSubmissions] = useState([]);
 
   function fetchTasks() {
     fetch(`${API_BASE_URL}/tasks`)
@@ -19,7 +21,17 @@ function App() {
       .catch((error) => {
         console.error("Error fetching tasks:", error);
       });
-    }
+   }
+  function fetchSubmissions(taskId) {
+    fetch(`${API_BASE_URL}/tasks/${taskId}/submissions`)
+      .then((response) => response.json())
+      .then((data) => {
+        setSubmissions(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching submissions:", error);
+      });
+  }
     
     useEffect(() => {
       fetchTasks();
@@ -89,6 +101,11 @@ function App() {
       setDescription(task.description);
     }
 
+    function handleViewSubmissions(task) {
+      setSelectedTask(task);
+      fetchSubmissions(task.id);
+    }
+
     return (
       <div style={{ padding: "2rem", fontFamily: "Arial" }}>
         <h1>AgentEval</h1>
@@ -109,7 +126,37 @@ function App() {
           tasks={tasks}
           handleEdit={handleEdit}
           handleDelete={handleDelete}
+          handleViewSubmissions={handleViewSubmissions}
         />
+
+        {selectedTask && (
+          <div>
+            <hr />
+
+            <h2>Submissions for: {selectedTask.title}</h2>
+
+            {submissions.length === 0? (
+              <p>No submissions found for this task.</p>
+            ) : (
+              <ul>
+                {submissions.map((submission) => (
+                  <li key={submission.id}>
+                    <strong>{submission.tool_name}</strong>
+                    <p>
+                      <strong>Prompt:</strong>{submission.prompt_used}
+                    </p>
+                    <pre>{submission.generated_code}</pre>
+                    <p>
+                      Iterations: {submission.iteration_count} | Manual edits: {" "}
+                      {submission.manual_edits} | Time: {" "}
+                      {submission.time_spent_seconds} s
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}  
       </div>
     );
 }
