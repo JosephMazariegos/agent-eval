@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import TaskForm from "./components/TaskForm";
 import TaskList from "./components/TaskList";
+import SubmissionForm from "./components/SubmissionForm";
+import SubmissionList from "./components/SubmissionList";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -182,100 +184,27 @@ function App() {
 
             <h2>Submissions for: {selectedTask.title}</h2>
 
-            <h3>Add Submission</h3>
-            <form onSubmit={handleSubmissionSubmit}>
-              <div>
-                <label>Tool Name</label>
-                <br />
-                <input
-                  type="text"
-                  value={toolName}
-                  onChange={(event) => setToolName(event.target.value)}
-                  placeholder="e.g. Cursor, Copilot, Claude Code"
-              />
-              </div>
+            <SubmissionForm
+              toolName={toolName}
+              promptUsed={promptUsed}
+              generatedCode={generatedCode}
+              iterationCount={iterationCount}
+              manualEdits={manualEdits}
+              timeSpendSeconds={timeSpendSeconds}
+              setToolName={setToolName}
+              setPromptUsed={setPromptUsed}
+              setGeneratedCode={setGeneratedCode}
+              setIterationCount={setIterationCount}
+              setManualEdits={setManualEdits}
+              setTimeSpendSeconds={setTimeSpendSeconds}
+              handleSubmissionSubmit={handleSubmissionSubmit}
+            />
 
-              <div>
-                <label>Prompt Used</label>
-                <br />
-                <textarea
-                  value={promptUsed}
-                  onChange={(event) => setPromptUsed(event.target.value)}
-                  placeholder="Paste the prompt that was used."
-                />
-              </div>
+            <hr />
 
-              <div>
-                <label>Generated Code</label>
-                <br />
-                <textarea
-                  value={generatedCode}
-                  onChange={(event) => setGeneratedCode(event.target.value)}
-                  placeholder="Paste the generated code."
-                  rows={8}
-                  cols={80}
-                />
-              </div>
-
-              <div>
-                <label>Iteration Count</label>
-                <br />
-                <input
-                  type="number"
-                  value={iterationCount}
-                  onChange={(event) => setIterationCount(event.target.value)}
-                />
-              </div>
-
-              <br />
-
-              <div>
-                <label>Manual Edits</label>
-                <br />
-                <input
-                  type="number"
-                  value={manualEdits}
-                  onChange={(event) => setManualEdits(event.target.value)}
-                />
-              </div>
-
-              <br />
-              <div>
-                <label>Time Spent (seconds)</label>
-                <br />
-                <input
-                  type="number"
-                  value={timeSpendSeconds}
-                  onChange={(event) => setTimeSpendSeconds(event.target.value)}
-                />
-              </div>
-
-              <br />
-              <button type="submit">Add Submission</button>
-            </form>
-
-            {submissions.length === 0? (
-              <p>No submissions found for this task.</p>
-            ) : (
-              <ul>
-                {submissions.map((submission) => (
-                  <li key={submission.id}>
-                    <strong>{submission.tool_name}</strong>
-                    <p>
-                      <strong>Prompt:</strong>{submission.prompt_used}
-                    </p>
-                    <pre>{submission.generated_code}</pre>
-                    <p>
-                      Iterations: {submission.iteration_count} | Manual edits: {" "}
-                      {submission.manual_edits} | Time: {" "}
-                      {submission.time_spent_seconds} s
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            )}
+            <SubmissionList submissions={submissions} />
           </div>
-        )}  
+        )}
       </div>
     );
 }
