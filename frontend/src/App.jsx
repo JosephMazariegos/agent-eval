@@ -12,6 +12,13 @@ function App() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [submissions, setSubmissions] = useState([]);
 
+  const [toolName, setToolName] = useState("");
+  const [promptUsed, setPromptUsed] = useState("");
+  const [generatedCode, setGeneratedCode] = useState("");
+  const [iterationCount, setIterationCount] = useState(1);
+  const [manualEdits, setManualEdits] = useState(0);
+  const [timeSpendSeconds, setTimeSpendSeconds] = useState(0);
+
   function fetchTasks() {
     fetch(`${API_BASE_URL}/tasks`)
       .then((response) => response.json())
@@ -106,11 +113,51 @@ function App() {
       fetchSubmissions(task.id);
     }
 
+    function handleSubmissionSubmit(event) {
+      event.preventDefault();
+
+      if (selectedTask === null) {
+        return;
+      }
+
+      const submissionData = {
+        tool_name: toolName,
+        prompt_used: promptUsed,
+        generated_code: generatedCode,
+        iteration_count: Number(iterationCount),
+        manual_edits: Number(manualEdits),
+        time_spent_seconds: Number(timeSpendSeconds),
+      };
+
+      fetch(`${API_BASE_URL}/tasks/${selectedTask.id}/submissions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(submissionData),
+      })
+        .then((response) => response.json())
+        .then(() => {
+          setToolName("");
+          setPromptUsed("");
+          setGeneratedCode("");
+          setIterationCount(1);
+          setManualEdits(0);
+          setTimeSpendSeconds(0);
+
+          fetchSubmissions(selectedTask.id);
+        })
+        .catch((error) => {
+          console.error("Error creating submission:", error);
+        });
+    }
+
     return (
       <div style={{ padding: "2rem", fontFamily: "Arial" }}>
         <h1>AgentEval</h1>
 
         <TaskForm
+        // title, description, editingTaskId, etc... are all props passed to the TaskForm component
           title={title}
           description={description}
           editingTaskId={editingTaskId}
@@ -134,6 +181,78 @@ function App() {
             <hr />
 
             <h2>Submissions for: {selectedTask.title}</h2>
+
+            <h3>Add Submission</h3>
+            <form onSubmit={handleSubmissionSubmit}>
+              <div>
+                <label>Tool Name</label>
+                <br />
+                <input
+                  type="text"
+                  value={toolName}
+                  onChange={(event) => setToolName(event.target.value)}
+                  placeholder="e.g. Cursor, Copilot, Claude Code"
+              />
+              </div>
+
+              <div>
+                <label>Prompt Used</label>
+                <br />
+                <textarea
+                  value={promptUsed}
+                  onChange={(event) => setPromptUsed(event.target.value)}
+                  placeholder="Paste the prompt that was used."
+                />
+              </div>
+
+              <div>
+                <label>Generated Code</label>
+                <br />
+                <textarea
+                  value={generatedCode}
+                  onChange={(event) => setGeneratedCode(event.target.value)}
+                  placeholder="Paste the generated code."
+                  rows={8}
+                  cols={80}
+                />
+              </div>
+
+              <div>
+                <label>Iteration Count</label>
+                <br />
+                <input
+                  type="number"
+                  value={iterationCount}
+                  onChange={(event) => setIterationCount(event.target.value)}
+                />
+              </div>
+
+              <br />
+
+              <div>
+                <label>Manual Edits</label>
+                <br />
+                <input
+                  type="number"
+                  value={manualEdits}
+                  onChange={(event) => setManualEdits(event.target.value)}
+                />
+              </div>
+
+              <br />
+              <div>
+                <label>Time Spent (seconds)</label>
+                <br />
+                <input
+                  type="number"
+                  value={timeSpendSeconds}
+                  onChange={(event) => setTimeSpendSeconds(event.target.value)}
+                />
+              </div>
+
+              <br />
+              <button type="submit">Add Submission</button>
+            </form>
 
             {submissions.length === 0? (
               <p>No submissions found for this task.</p>
