@@ -118,3 +118,49 @@ def get_submissions_for_task(
     return (
         db.query(models.SubmissionsDB).filter(models.SubmissionsDB.task_id == task_id).all()
     )
+
+@app.post(
+    "/submissions/{submission_id}/evaluation",
+    response_model=schemas.EvaluationResponse
+)
+def create_evaluation(
+    submission_id: int,
+    evaluation: schemas.EvaluationCreate,
+    db: Session = Depends(get_db),
+):
+    submission = (db.query(models.SubmissionsDB).filter(models.SubmissionsDB.id == submission_id).first())
+
+    if submission is None:
+        raise HTTPException(status_code=404, detail="Submission not found")
+
+    db_evaluation = models.EvaluationResultDB(
+        submission_id = submission_id,
+        tests_passed = evaluation.tests_passed,
+        tests_failed = evaluation.tests_failed,
+        runtime_ms = evaluation.runtime_ms,
+        lint_errors = evaluation.lint_errors,
+        score = evaluation.score,
+        notes = evaluation.notes,
+    )
+
+    db.add(db_evaluation)
+    db.commit()
+    db.refresh(db_evaluation)
+
+    return db_evaluation
+
+@app.get(
+    "/submissions/{submission_id}/evaluation",
+    response_model=list[schemas.EvaluationResponse]
+)
+def get_evaluations_for_submission(
+    submission_id: int,
+    db : Session = Depends(get_db)
+):
+    submission = (db.query(models.SubmissionsDB).filter(models.SubmissionsDB.id == submission_id).first())
+
+    if submission is None:
+        raise HTTPException(status_code=404, detail="Submission not found")
+
+    return (
+        db.query(models.EvaluationResultDB).filter(models.EvaluationResultDB.submission_id == submission_id).all())

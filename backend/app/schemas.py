@@ -36,3 +36,24 @@ class SubmissionResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class EvaluationCreate(BaseModel):
+    tests_passed: int = 0
+    tests_failed: int = 0
+    runtime_ms: int = 0
+    lint_errors: int = 0
+    score: int = 0
+    notes: str | None = None
+
+class EvaluationResponse(BaseModel):
+    id: int
+    submission_id: int
+    tests_passed: int
+    tests_failed: int
+    runtime_ms: int
+    lint_errors: int
+    score: int
+    notes: str | None = None
+
+    class Confid:
+        from_attributes = True
