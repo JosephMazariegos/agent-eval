@@ -55,5 +55,5 @@ class EvaluationResponse(BaseModel):
     score: int
     notes: str | None = None
 
-    class Confid:
+    class Config:
         from_attributes = True

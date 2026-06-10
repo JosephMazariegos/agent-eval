@@ -3,6 +3,7 @@ import TaskForm from "./components/TaskForm";
 import TaskList from "./components/TaskList";
 import SubmissionForm from "./components/SubmissionForm";
 import SubmissionList from "./components/SubmissionList";
+import MetricsSummary from "./components/MetricsSummary";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -13,13 +14,22 @@ function App() {
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const [submissions, setSubmissions] = useState([]);
-
   const [toolName, setToolName] = useState("");
   const [promptUsed, setPromptUsed] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
   const [iterationCount, setIterationCount] = useState(1);
   const [manualEdits, setManualEdits] = useState(0);
   const [timeSpendSeconds, setTimeSpendSeconds] = useState(0);
+
+  const [evaluationsBySubmission, setEvaluationsBySubmission] = useState({});
+  const [evaluationFormSubmissionId, setEvaluationFormSubmissionId] = useState(null);
+  
+  const [testsPassed, setTestsPassed] = useState(0);
+  const [testsFailed, setTestsFailed] = useState(0);
+  const [runtimeMs, setRuntimeMs] = useState(0);
+  const [lintErrors, setLintErrors] = useState(0);
+  const [score, setScore] = useState(0);
+  const [evaluationNotes, setEvaluationNotes] = useState("");
 
   function fetchTasks() {
     fetch(`${API_BASE_URL}/tasks`)
@@ -36,6 +46,11 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         setSubmissions(data);
+
+        // also load evaluations for each submission
+        data.forEach((submission) => {
+          fetchEvaluations(submission.id);
+        });
       })
       .catch((error) => {
         console.error("Error fetching submissions:", error);
@@ -154,6 +169,61 @@ function App() {
         });
     }
 
+    function fetchEvaluations(submissionId) {
+      fetch(`${API_BASE_URL}/submissions/${submissionId}/evaluation`)
+        .then((response) => response.json())
+        .then((data) => {
+          setEvaluationsBySubmission((previousEvaluations) => ({
+            ...previousEvaluations,
+            [submissionId]: data,
+          }));
+        })
+        .catch((error) => {
+          console.error("Error fetching evaluations:", error);
+        });
+    }
+
+    function handleEvaluationSubmit(event) {
+      event.preventDefault();
+
+      if (evaluationFormSubmissionId === null) {
+        return;
+      }
+
+      const evaluationData = {
+        tests_passed: Number(testsPassed),
+        tests_failed: Number(testsFailed),
+        runtime_ms: Number(runtimeMs),
+        lint_errors: Number(lintErrors),
+        score: Number(score),
+        notes: evaluationNotes,
+      };
+
+      fetch(`${API_BASE_URL}/submissions/${evaluationFormSubmissionId}/evaluation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(evaluationData),
+        }
+      )
+        .then((response) => response.json())
+        .then(() => {
+          setTestsPassed(0);
+          setTestsFailed(0);
+          setRuntimeMs(0);
+          setLintErrors(0);
+          setScore(0);
+          setEvaluationNotes("");
+          setEvaluationFormSubmissionId(null);
+          fetchEvaluations(evaluationFormSubmissionId);
+        })
+        .catch((error) => {
+          console.error("Error creating evaluation:", error);
+        });
+    }
+
     return (
       <div style={{ padding: "2rem", fontFamily: "Arial" }}>
         <h1>AgentEval</h1>
@@ -184,6 +254,8 @@ function App() {
 
             <h2>Submissions for: {selectedTask.title}</h2>
 
+            <MetricsSummary submissions={submissions} evaluationsBySubmission={evaluationsBySubmission} />
+
             <SubmissionForm
               toolName={toolName}
               promptUsed={promptUsed}
@@ -202,7 +274,25 @@ function App() {
 
             <hr />
 
-            <SubmissionList submissions={submissions} />
+            <SubmissionList 
+              submissions={submissions}
+              evaluationsBySubmission={evaluationsBySubmission}
+              evaluationFormSubmissionId={evaluationFormSubmissionId}
+              setEvaluationFormSubmissionId={setEvaluationFormSubmissionId}
+              testsPassed={testsPassed}
+              testsFailed={testsFailed}
+              runtimeMs={runtimeMs}
+              lintErrors={lintErrors}
+              score={score}
+              evaluationNotes={evaluationNotes}
+              setTestsPassed={setTestsPassed}
+              setTestsFailed={setTestsFailed}
+              setRuntimeMs={setRuntimeMs}
+              setLintErrors={setLintErrors}
+              setScore={setScore}
+              setEvaluationNotes={setEvaluationNotes}
+              handleEvaluationSubmit={handleEvaluationSubmit}
+            />
           </div>
         )}
       </div>
