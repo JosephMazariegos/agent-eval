@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "./App.css";
 import TaskForm from "./components/TaskForm";
 import TaskList from "./components/TaskList";
 import SubmissionForm from "./components/SubmissionForm";
@@ -226,78 +227,83 @@ function App() {
     }
 
     return (
-      <div style={{ padding: "2rem", fontFamily: "Arial" }}>
-        <h1>AgentEval</h1>
+      <div className="app">
+        <header className="app-header">
+          <h1>AgentEval</h1>
+          <p>Evaluate and compare agentic code generation tools</p>
+        </header>
+        
+        <main className="app-main">
+          <TaskForm
+          // title, description, editingTaskId, etc... are all props passed to the TaskForm component
+            title={title}
+            description={description}
+            editingTaskId={editingTaskId}
+            setTitle={setTitle}
+            setDescription={setDescription}
+            setEditingTaskId={setEditingTaskId}
+            handleSubmit={handleSubmit}
+          />
 
-        <TaskForm
-        // title, description, editingTaskId, etc... are all props passed to the TaskForm component
-          title={title}
-          description={description}
-          editingTaskId={editingTaskId}
-          setTitle={setTitle}
-          setDescription={setDescription}
-          setEditingTaskId={setEditingTaskId}
-          handleSubmit={handleSubmit}
-        />
+          <hr />
 
-        <hr />
+          <TaskList
+            tasks={tasks}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            handleViewSubmissions={handleViewSubmissions}
+          />
 
-        <TaskList
-          tasks={tasks}
-          handleEdit={handleEdit}
-          handleDelete={handleDelete}
-          handleViewSubmissions={handleViewSubmissions}
-        />
+          {selectedTask && (
+            <div>
+              <hr />
 
-        {selectedTask && (
-          <div>
-            <hr />
+              <h2>Submissions for: {selectedTask.title}</h2>
 
-            <h2>Submissions for: {selectedTask.title}</h2>
+              <MetricsSummary submissions={submissions} evaluationsBySubmission={evaluationsBySubmission} />
 
-            <MetricsSummary submissions={submissions} evaluationsBySubmission={evaluationsBySubmission} />
+              <ToolComparison submissions={submissions} evaluationsBySubmission={evaluationsBySubmission} />
 
-            <ToolComparison submissions={submissions} evaluationsBySubmission={evaluationsBySubmission} />
+              <SubmissionForm
+                toolName={toolName}
+                promptUsed={promptUsed}
+                generatedCode={generatedCode}
+                iterationCount={iterationCount}
+                manualEdits={manualEdits}
+                timeSpendSeconds={timeSpendSeconds}
+                setToolName={setToolName}
+                setPromptUsed={setPromptUsed}
+                setGeneratedCode={setGeneratedCode}
+                setIterationCount={setIterationCount}
+                setManualEdits={setManualEdits}
+                setTimeSpendSeconds={setTimeSpendSeconds}
+                handleSubmissionSubmit={handleSubmissionSubmit}
+              />
 
-            <SubmissionForm
-              toolName={toolName}
-              promptUsed={promptUsed}
-              generatedCode={generatedCode}
-              iterationCount={iterationCount}
-              manualEdits={manualEdits}
-              timeSpendSeconds={timeSpendSeconds}
-              setToolName={setToolName}
-              setPromptUsed={setPromptUsed}
-              setGeneratedCode={setGeneratedCode}
-              setIterationCount={setIterationCount}
-              setManualEdits={setManualEdits}
-              setTimeSpendSeconds={setTimeSpendSeconds}
-              handleSubmissionSubmit={handleSubmissionSubmit}
-            />
+              <hr />
 
-            <hr />
-
-            <SubmissionList 
-              submissions={submissions}
-              evaluationsBySubmission={evaluationsBySubmission}
-              evaluationFormSubmissionId={evaluationFormSubmissionId}
-              setEvaluationFormSubmissionId={setEvaluationFormSubmissionId}
-              testsPassed={testsPassed}
-              testsFailed={testsFailed}
-              runtimeMs={runtimeMs}
-              lintErrors={lintErrors}
-              score={score}
-              evaluationNotes={evaluationNotes}
-              setTestsPassed={setTestsPassed}
-              setTestsFailed={setTestsFailed}
-              setRuntimeMs={setRuntimeMs}
-              setLintErrors={setLintErrors}
-              setScore={setScore}
-              setEvaluationNotes={setEvaluationNotes}
-              handleEvaluationSubmit={handleEvaluationSubmit}
-            />
-          </div>
-        )}
+              <SubmissionList 
+                submissions={submissions}
+                evaluationsBySubmission={evaluationsBySubmission}
+                evaluationFormSubmissionId={evaluationFormSubmissionId}
+                setEvaluationFormSubmissionId={setEvaluationFormSubmissionId}
+                testsPassed={testsPassed}
+                testsFailed={testsFailed}
+                runtimeMs={runtimeMs}
+                lintErrors={lintErrors}
+                score={score}
+                evaluationNotes={evaluationNotes}
+                setTestsPassed={setTestsPassed}
+                setTestsFailed={setTestsFailed}
+                setRuntimeMs={setRuntimeMs}
+                setLintErrors={setLintErrors}
+                setScore={setScore}
+                setEvaluationNotes={setEvaluationNotes}
+                handleEvaluationSubmit={handleEvaluationSubmit}
+              />
+            </div>
+          )}
+        </main>
       </div>
     );
 }
