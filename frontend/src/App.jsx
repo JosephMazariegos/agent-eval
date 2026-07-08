@@ -4,6 +4,7 @@ import TaskList from "./components/TaskList";
 import SubmissionForm from "./components/SubmissionForm";
 import SubmissionList from "./components/SubmissionList";
 import MetricsSummary from "./components/MetricsSummary";
+import ToolComparison from "./components/ToolComparison";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -255,6 +256,8 @@ function App() {
             <h2>Submissions for: {selectedTask.title}</h2>
 
             <MetricsSummary submissions={submissions} evaluationsBySubmission={evaluationsBySubmission} />
+
+            <ToolComparison submissions={submissions} evaluationsBySubmission={evaluationsBySubmission} />
 
             <SubmissionForm
               toolName={toolName}
