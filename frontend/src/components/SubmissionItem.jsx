@@ -21,7 +21,7 @@ function SubmissionItem({
     handleEvaluationSubmit,
  }) {
     return (
-        <li>
+        <li className="submission-card">
             <strong>{submission.tool_name}</strong>
 
             <p>

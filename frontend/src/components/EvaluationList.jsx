@@ -9,7 +9,7 @@ function EvaluationList({ evaluations }) {
 
       <ul>
         {evaluations.map((evaluation) => (
-          <li key={evaluation.id}>
+          <li key={evaluation.id} className="evaluation-card">
             <p>
               <strong>Score:</strong> {evaluation.score}
             </p>
