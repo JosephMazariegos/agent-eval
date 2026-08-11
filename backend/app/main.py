@@ -164,3 +164,48 @@ def get_evaluations_for_submission(
 
     return (
         db.query(models.EvaluationResultDB).filter(models.EvaluationResultDB.submission_id == submission_id).all())
+
+@app.put(
+    "/evaluations/{evaluation_id}",
+    response_model=schemas.EvaluationResponse,
+)
+def update_evaluation(
+    evaluation_id: int,
+    updated_evaluation: schemas.EvaluationUpdate,
+    db: Session = Depends(get_db),
+):
+    evaluation = (
+        db.query(models.EvaluationResultDB).filter(models.EvaluationResultDB.id == evaluation_id).first()
+    )
+
+    if evaluation is None:
+        raise HTTPException(status_code=404, detail="Evaluation not found")
+
+    evaluation.tests_passed = updated_evaluation.tests_passed
+    evaluation.tests_failed = updated_evaluation.tests_failed
+    evaluation.runtime_ms = updated_evaluation.runtime_ms
+    evaluation.lint_errors = updated_evaluation.lint_errors
+    evaluation.score = updated_evaluation.score
+    evaluation.notes = updated_evaluation.notes
+
+    db.commit()
+    db.refresh(evaluation)
+
+    return evaluation
+
+@app.delete("/evaluations/{evaluation_id}")
+def delete_evaluation(
+    evaluation_id: int,
+    db: Session = Depends(get_db),
+):
+    evaluation = (
+        db.query(models.EvaluationResultDB).filter(models.EvaluationResultDB.id == evaluation_id).first()
+    )
+
+    if evaluation is None:
+        raise HTTPException(status_code=404, detail="Evaluation not found")
+
+    db.delete(evaluation)
+    db.commit()
+
+    return {"message": "Evaluation deleted"}

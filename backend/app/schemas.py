@@ -45,6 +45,15 @@ class EvaluationCreate(BaseModel):
     score: int = 0
     notes: str | None = None
 
+
+class EvaluationUpdate(BaseModel):
+    tests_passed: int = 0
+    tests_failed: int = 0
+    runtime_ms: int = 0
+    lint_errors: int = 0
+    score: int = 0
+    notes: str | None = None
+
 class EvaluationResponse(BaseModel):
     id: int
     submission_id: int
