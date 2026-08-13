@@ -18,6 +18,9 @@ function SubmissionList ({
     setScore,
     setEvaluationNotes,
     handleEvaluationSubmit,
+    handleDeleteEvaluation,
+    handleEditEvaluation,
+    editingEvaluationId,
 }) {
     return (
         <>
@@ -30,6 +33,7 @@ function SubmissionList ({
                       key={submission.id} 
                       submission={submission}
                       evaluations={evaluationsBySubmission[submission.id] || []}
+                      handleDeleteEvaluation={handleDeleteEvaluation}
                       evaluationFormSubmissionId={evaluationFormSubmissionId}
                       setEvaluationFormSubmissionId={setEvaluationFormSubmissionId}
                       testsPassed={testsPassed}
@@ -45,6 +49,8 @@ function SubmissionList ({
                       setScore={setScore}
                       setEvaluationNotes={setEvaluationNotes}
                       handleEvaluationSubmit={handleEvaluationSubmit}
+                      handleEditEvaluation={handleEditEvaluation}
+                      editingEvaluationId={editingEvaluationId}
                     />
                 ))}
             </ul>

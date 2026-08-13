@@ -12,10 +12,15 @@ function EvaluationForm({
     setScore,
     setEvaluationNotes,
     handleEvaluationSubmit,
+    editingEvaluationId,
 }) {
     return (
         <form onSubmit={handleEvaluationSubmit}>
-            <h4>Add Evaluation</h4>
+            <h4>
+              {editingEvaluationId === null
+              ? "Add Evaluation"
+              : "Edit Evaluation"}
+            </h4>
 
             <div>
                 <label>Tests Passed</label>
@@ -88,7 +93,11 @@ function EvaluationForm({
             </div>
 
             <br />
-            <button type="submit">Add Evaluation</button>
+            <button type="submit">
+              {editingEvaluationId === null
+              ? "Save Evaluation"
+              : "Update Evaluation"}
+            </button>
         </form>
     );
 }

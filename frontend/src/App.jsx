@@ -32,6 +32,7 @@ function App() {
   const [lintErrors, setLintErrors] = useState(0);
   const [score, setScore] = useState(0);
   const [evaluationNotes, setEvaluationNotes] = useState("");
+  const [editingEvaluationId, setEditingEvaluationId] = useState(null);
 
   function fetchTasks() {
     fetch(`${API_BASE_URL}/tasks`)
@@ -200,32 +201,81 @@ function App() {
         score: Number(score),
         notes: evaluationNotes,
       };
-
-      fetch(`${API_BASE_URL}/submissions/${evaluationFormSubmissionId}/evaluation`,
-        {
-          method: "POST",
+      
+      if (editingEvaluationId === null) {
+        fetch(`${API_BASE_URL}/submissions/${evaluationFormSubmissionId}/evaluation`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(evaluationData),
+          }
+        )
+          .then((response) => response.json())
+          .then(() => {
+            resetEvaluationForm();
+            fetchEvaluations(evaluationFormSubmissionId);
+          })
+          .catch((error) => {
+            console.error("Error creating evaluation:", error);
+          });
+      } else {
+        fetch(`${API_BASE_URL}/evaluations/${editingEvaluationId}`, {
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(evaluationData),
-        }
-      )
+        })
         .then((response) => response.json())
         .then(() => {
-          setTestsPassed(0);
-          setTestsFailed(0);
-          setRuntimeMs(0);
-          setLintErrors(0);
-          setScore(0);
-          setEvaluationNotes("");
-          setEvaluationFormSubmissionId(null);
-          fetchEvaluations(evaluationFormSubmissionId);
+          const submissionId = evaluationFormSubmissionId;
+
+          resetEvaluationForm();
+          fetchEvaluations(submissionId);
         })
         .catch((error) => {
-          console.error("Error creating evaluation:", error);
+          console.error("Error updating evaluation:", error);
+        });
+      }
+    }
+
+    function handleDeleteEvaluation(evaluationId, submissionId) {
+      fetch(`${API_BASE_URL}/evaluations/${evaluationId}`, {
+        method: "DELETE",
+      })
+        .then(() => {
+          fetchEvaluations(submissionId);
+        })
+        .catch((error) => {
+          console.error("Error deleting evaluation:", error);
         });
     }
 
+    function handleEditEvaluation(evaluation) {
+      setEditingEvaluationId(evaluation.id);
+      setEvaluationFormSubmissionId(evaluation.submission_id);
+
+      setTestsPassed(evaluation.tests_passed);
+      setTestsFailed(evaluation.tests_failed);
+      setRuntimeMs(evaluation.runtime_ms);
+      setLintErrors(evaluation.lint_errors);
+      setScore(evaluation.score);
+      setEvaluationNotes(evaluation.notes || "");
+    }
+
+    function resetEvaluationForm() {
+      setTestsPassed(0);
+      setTestsFailed(0);
+      setRuntimeMs(0);
+      setLintErrors(0);
+      setScore(0);
+      setEvaluationNotes("");
+      setEditingEvaluationId(null);
+      setEvaluationFormSubmissionId(null);
+    }
+    
     return (
       <div className="app">
         <header className="app-header">
@@ -300,6 +350,9 @@ function App() {
                 setScore={setScore}
                 setEvaluationNotes={setEvaluationNotes}
                 handleEvaluationSubmit={handleEvaluationSubmit}
+                handleDeleteEvaluation={handleDeleteEvaluation}
+                handleEditEvaluation={handleEditEvaluation}
+                editingEvaluationId={editingEvaluationId}
               />
             </div>
           )}

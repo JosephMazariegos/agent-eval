@@ -1,4 +1,9 @@
-function EvaluationList({ evaluations }) {
+function EvaluationList({ 
+  evaluations,
+  submissionId,
+  handleDeleteEvaluation,
+  handleEditEvaluation,
+}) {
   if (!evaluations || evaluations.length === 0) {
     return <p>No evaluations yet.</p>;
   }
@@ -32,6 +37,18 @@ function EvaluationList({ evaluations }) {
                 <strong>Notes:</strong> {evaluation.notes}
               </p>
             )}
+            <button onClick={()=> handleEditEvaluation(evaluation)}>
+              Edit Evaluation
+            </button>
+
+            <button
+              className="danger"
+              onClick={() =>
+                handleDeleteEvaluation(evaluation.id, submissionId)
+              }
+            >
+              Delete Evaluation
+            </button>
           </li>
         ))}
       </ul>

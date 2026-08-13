@@ -19,6 +19,9 @@ function SubmissionItem({
     setScore,
     setEvaluationNotes,
     handleEvaluationSubmit,
+    handleEditEvaluation,
+    handleDeleteEvaluation,
+    editingEvaluationId,
  }) {
     return (
         <li className="submission-card">
@@ -54,10 +57,16 @@ function SubmissionItem({
                   setScore={setScore}
                   setEvaluationNotes={setEvaluationNotes}
                   handleEvaluationSubmit={handleEvaluationSubmit}
+                  editingEvaluationId={editingEvaluationId}
                 />
             )}
 
-            <EvaluationList evaluations={evaluations} />
+            <EvaluationList 
+                evaluations={evaluations} 
+                submissionId={submission.id}
+                handleDeleteEvaluation={handleDeleteEvaluation}
+                handleEditEvaluation={handleEditEvaluation}
+            />
         </li>
     );
 }
