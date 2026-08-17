@@ -3,19 +3,26 @@ from pydantic import BaseModel
 class TaskCreate(BaseModel):
     title: str
     description: str
+    category: str
+    difficulty: str
+    language: str
 
 class TaskResponse(BaseModel):
     id: int
     title: str
     description: str
-
+    category: str
+    difficulty: str
+    language: str
     class Config:
         from_attributes = True
 
 class TaskUpdate(BaseModel):
     title: str
     description: str
-
+    category: str
+    difficulty: str
+    language: str
 class SubmissionCreate(BaseModel):
     tool_name: str
     prompt_used: str

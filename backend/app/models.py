@@ -7,6 +7,9 @@ class TaskDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    difficulty = Column(String, nullable=False)
+    language = Column(String, nullable=False)
 
 class SubmissionsDB(Base):
     __tablename__ = "submissions"

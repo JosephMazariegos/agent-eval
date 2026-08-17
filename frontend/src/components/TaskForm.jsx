@@ -6,6 +6,12 @@ function TaskForm({
     setDescription,
     setEditingTaskId,
     handleSubmit,
+    category,
+    setCategory,
+    difficulty,
+    setDifficulty,
+    language,
+    setLanguage,
 }) {
     return (
       <>
@@ -33,6 +39,41 @@ function TaskForm({
                   onChange={(event) => setDescription(event.target.value)}
                   placeholder="e.g. Describe the task..."
                 />
+            </div>
+
+            <div>
+              <label>Category</label>
+              <br/>
+              <input
+                type="text"
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                placeholder="e.g. Algorithms"
+                />
+            </div>
+
+            <div>
+              <label>Difficulty</label>
+              <br/>
+              <select
+                value={difficulty}
+                onChange={(event) => setDifficulty(event.target.value)}
+              >
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+            
+            <div>
+              <label>Language</label>
+              <br/>
+              <input
+                type="text"
+                value={language}
+                onChange={(event) => setLanguage(event.target.value)}
+                placeholder="e.g. Python"
+              />
             </div>
 
             <br />

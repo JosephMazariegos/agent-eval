@@ -13,6 +13,9 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [difficulty, setDifficulty] = useState("");
+  const [language, setLanguage] = useState("");
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const [submissions, setSubmissions] = useState([]);
@@ -70,6 +73,9 @@ function App() {
       const taskData = {
         title: title,
         description: description,
+        category: category,
+        difficulty: difficulty,
+        language: language,
       };
 
       if (editingTaskId === null) {
@@ -84,6 +90,10 @@ function App() {
           .then(() => {
             setTitle("");
             setDescription("");
+            setCategory("");
+            setDifficulty("");
+            setLanguage("");
+
             fetchTasks();
           })
           .catch((error) => {
@@ -102,6 +112,10 @@ function App() {
             setTitle("");
             setDescription("");
             setEditingTaskId(null);
+            setCategory("");
+            setDifficulty("");
+            setLanguage("");
+            
             fetchTasks();
           })
           .catch((error) => {
@@ -126,6 +140,9 @@ function App() {
       setEditingTaskId(task.id);
       setTitle(task.title);
       setDescription(task.description);
+      setCategory(task.category);
+      setDifficulty(task.difficulty);
+      setLanguage(task.language);
     }
 
     function handleViewSubmissions(task) {
@@ -293,6 +310,12 @@ function App() {
             setDescription={setDescription}
             setEditingTaskId={setEditingTaskId}
             handleSubmit={handleSubmit}
+            category={category}
+            setCategory={setCategory}
+            difficulty={difficulty}
+            setDifficulty={setDifficulty}
+            language={language}
+            setLanguage={setLanguage}
           />
 
           <hr />

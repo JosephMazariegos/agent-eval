@@ -31,7 +31,12 @@ def read_root():
 # Add a POST endpoint (create a task)
 @app.post("/tasks", response_model=schemas.TaskResponse)
 def create_task(task: schemas.TaskCreate, db: Session = Depends(get_db)):
-    db_task = models.TaskDB(title=task.title, description=task.description)
+    db_task = models.TaskDB(
+        title=task.title, 
+        description=task.description, 
+        category=task.category, 
+        difficulty=task.difficulty, 
+        language=task.language)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
@@ -60,6 +65,9 @@ def update_task(task_id: int, updated_task: schemas.TaskUpdate, db: Session = De
 
     task.title = updated_task.title
     task.description = updated_task.description
+    task.category = updated_task.category
+    task.difficulty = updated_task.difficulty
+    task.language = updated_task.language
 
     db.commit()
     db.refresh(task)
